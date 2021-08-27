@@ -51,10 +51,9 @@
             <tbody>
             <c:forEach items="${ listSoli }" var="soli" varStatus="status">
                 <tr>
-                    <<td>${ soli.idComite }</td>
-                    <td>${ soli.colonia}</td>
-                    <td>${ soli.nombre }</td>
-                    <td>${ soli.telefono}</td>
+                    <<td>${ soli.numSolicitud }</td>
+                    <td>${ soli.servicioAsignado}</td>
+                    <td>${ soli.status }</td>
                     <td>
                         <form action="${context}/deleteUser" method="POST">
                             <input type="hidden" name="action" value="delete">

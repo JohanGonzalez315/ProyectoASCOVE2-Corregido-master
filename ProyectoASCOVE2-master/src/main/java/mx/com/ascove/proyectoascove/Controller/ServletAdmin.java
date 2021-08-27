@@ -3,10 +3,7 @@ package mx.com.ascove.proyectoascove.Controller;
 import com.google.gson.Gson;
 import mx.com.ascove.proyectoascove.Model.BeanEmpleados;
 import mx.com.ascove.proyectoascove.Model.DaoEmpleados;
-import mx.com.ascove.proyectoascove.Model.Usuario.BeanComite;
-import mx.com.ascove.proyectoascove.Model.Usuario.BeanUsuario;
-import mx.com.ascove.proyectoascove.Model.Usuario.DaoComite;
-import mx.com.ascove.proyectoascove.Model.Usuario.DaoUsuario;
+import mx.com.ascove.proyectoascove.Model.Usuario.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -19,7 +16,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@WebServlet(name = "ServletAdmin", urlPatterns = {"/ServletAdmin","/createUser", "/getUserById", "/findById", "/updateUser", "/deleteUser",  "/loginUser", "/logout", "/searchUser", "/createComite", "/vistaComite", "/vistaSolicitud"})
+@WebServlet(name = "ServletAdmin", urlPatterns = {"/ServletAdmin","/createUser", "/getUserById", "/findById", "/updateUser", "/deleteUser",  "/loginUser", "/logout", "/searchUser", "/createComite", "/vistaComite", "/vistaSolicitud", "/createSoli"})
 
 public class ServletAdmin extends HttpServlet {
 
@@ -249,10 +246,13 @@ public class ServletAdmin extends HttpServlet {
                             break;
                         case 4:
                             //Aquí ponen la ruta a donde debe redireccionar
-                            System.out.println("Sientra4");
+                            System.out.println("Sientra4 "+usuarios.getIdEmpleados());
+                            request.setAttribute("listUniqueUser", new DaoEmpleados().findUser(usuarios.getIdEmpleados()));
+                            request.setAttribute("listSoliById", new DaoSolicitud().findSoliById(usuarios.getIdEmpleados()));
                             request.getRequestDispatcher("/views/Comite/GestionarSolicitudes.jsp").forward(request, response);
                             break;
                         default:
+
                             //Este reenvía al index por default si es que no existe el usuario en la base de datos
                             request.getRequestDispatcher("/views/index.jsp").forward(request, response);
                             break;
@@ -343,9 +343,46 @@ public class ServletAdmin extends HttpServlet {
                 request.getRequestDispatcher("/views/Enlace/GestionarComites.jsp").forward(request, response);
                 break;
             case "vistaSolicitud":
+
                 System.out.println("Solicitud");
-                request.setAttribute("listSoli", new DaoComite().findSoli());
+                request.setAttribute("listSoli", new DaoSolicitud().findSoli());
                 request.getRequestDispatcher("/views/Enlace/GestionarSolicitud.jsp").forward(request, response);
+                break;
+            case "createSoli":
+
+                String descripcion = request.getParameter("descripcion");
+                String servicioasignado = request.getParameter("servicioasignado");
+                String fecha = request.getParameter("fecha");
+                int idEmpleado = Integer.parseInt(request.getParameter("idEmpleado"));
+                int idEnlace = Integer.parseInt(request.getParameter("idEnlace"));
+
+
+                BeanSolicitud beanSolicitud = new BeanSolicitud();
+
+                beanSolicitud.setDescripcion(descripcion);
+                beanSolicitud.setServicioAsignado(servicioasignado);
+                beanSolicitud.setFechaInicio(fecha);
+                beanSolicitud.setIdSolicitante(idEmpleado);
+                beanSolicitud.setIdEnlace(idEnlace);
+
+                System.out.println("Contenido: "+beanSolicitud);
+
+                if (new DaoSolicitud().create(beanSolicitud)) {
+
+                    System.out.println("aqui"+ beanSolicitud.getIdSolicitante());
+                    request.setAttribute("message", "Usuario registrado correctamente");
+                    System.out.println("Enlaceeeee");
+                    request.setAttribute("listUniqueUser", new DaoEmpleados().findUser(beanSolicitud.getIdSolicitante()));
+                    request.setAttribute("listSoliById", new DaoSolicitud().findSoliById(beanSolicitud.getIdSolicitante()));
+                    request.getRequestDispatcher("/views/Comite/GestionarSolicitudes.jsp").forward(request, response);
+
+                } else {
+                    System.out.println("aquiiii2");
+                    request.setAttribute("message", "Usuario no registrado");
+                    request.setAttribute("listSoliById", new DaoSolicitud().findSoliById(beanSolicitud.getIdSolicitante()));
+                    request.getRequestDispatcher("/views/Comite/GestionarSolicitudes.jsp").forward(request, response);
+                }
+
                 break;
             default:
                 // vistaComite

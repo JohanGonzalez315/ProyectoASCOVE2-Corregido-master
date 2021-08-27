@@ -21,7 +21,7 @@ public class DaoComite {
     private ResultSet rs;
 
 
-    final private Logger CONSOLE = LoggerFactory.getLogger(DaoEmpleados.class);
+    final private Logger CONSOLE = LoggerFactory.getLogger(DaoComite.class);
 
     public boolean create (BeanComite beanComite) {
         boolean flag = false;
@@ -75,33 +75,5 @@ public class DaoComite {
             ConnectionMySQL.closeConnections(con, cstm);
         }
         return listComite;
-    }
-    public List<BeanComite> findSoli() {
-        List<BeanComite> listSoli = new ArrayList<>();
-
-        try {
-            con = ConnectionMySQL.getConnection();
-            cstm = con.prepareCall("{call findSoli}");
-            rs = cstm.executeQuery();
-
-            while (rs.next()){
-                BeanComite comite = new BeanComite();
-
-                comite.setIdComite(rs.getInt("NumeroSolicitud"));
-                comite.setColonia(rs.getString("Descripcion"));
-                comite.setNumIntegrantes(rs.getInt("NumIntegrantes"));
-                comite.setNombre(rs.getString("aPaterno"));
-                comite.setaMaterno(rs.getString("aMaterno"));
-                comite.setTelefono(rs.getInt("telefono"));
-
-
-                listSoli.add(comite);
-            }
-        }catch(SQLException e){
-            CONSOLE.error("Falló: " + e.getMessage());
-        }finally{
-            ConnectionMySQL.closeConnections(con, cstm);
-        }
-        return listSoli;
     }
 }

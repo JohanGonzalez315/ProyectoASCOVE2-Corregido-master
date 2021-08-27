@@ -33,8 +33,8 @@
 
     <nav class="navbar alinear margen7">
         <div class="container-fluid">
-            <form class="d-flex">
-                <button class="btn boton img.izquierda" type="submit">Cerrar sesión</button>
+            <form class="d-flex" action="${context}/logout" method="post">
+                <button class="btn boton img.izquierda" type="submit" name="action" value="logout">Cerrar sesión</button>
             </form>
         </div>
     </nav>
@@ -56,32 +56,20 @@
             </tr>
             </thead>
             <tbody>
-            <c:forEach items="${ listSolicitud }" var="game" varStatus="status">
+            <c:forEach items="${ listSoliById }" var="soliById" varStatus="status">
                 <tr>
-                    <!--<td>${ "" }</td>
-                    <td>${ "" }</td>
-                    <td>${ "" }</td>game.imgGame }</td>
-                    <td>${ "" }</td>
+                    <<td>${ soliById.numSolicitud }</td>
+                    <td>${ soliById.servicioAsignado}</td>
+                    <td>${ soliById.descripcion}</td>
+                    <td>${ soliById.status }</td>
                     <td>
-                        <c:if test="${ game.status == 1 }">
-                            <span class="badge rounded-pill bg-success">Activo</span>
-                        </c:if>
-                        <c:if test="${ game.status == 0 }">
-                            <span class="badge rounded-pill bg-danger">Inactivo</span>
-                        </c:if>
+                        <form action="${context}/deleteUser" method="POST">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="rolUsuario" value="">
+                            <input type="hidden" name="idUser" value="">
+                            <button id="btn-delete" name="action" value="delete" type="submit" class="btn btn-outline-danger" data-bs-toggle="modal"><i class="fas fa-trash"></i> Eliminar</button>
+                        </form>
                     </td>
-                    <td>
-                        <c:if test="${ game.status == 1 }">
-                            <form action="${context}/getGame" method="POST" style="display: inline;">
-                                <input type="hidden" name="action" value="getUserById">
-                                <input type="hidden" name="id" value="${ game.idGame }">
-                                <button type="submit" class="btn btn-outline-primary">Modificar</button>
-                            </form>
-                        </c:if>
-                        <c:if test="${ game.status == 0 }">
-                            <button id="btn-details-${ status.count }" data-code="${ game.idGame }" type="submit" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#details"><i class="fas fa-info-circle"></i> Detalles</button>
-                        </c:if>
-                    </td>-->
                 </tr>
             </c:forEach>
             </tbody>
@@ -91,7 +79,7 @@
 
 
 <!--MODAL REGISTRAR-->
-<form id="formularioSolicitud" >
+<form method="POST" action="${context}/createSoli">
     <div class="modal fade" id="addSol" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
          aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -105,58 +93,38 @@
                         <div class="col-lg-12">
                             <div class="row">
                                 <div class="col-lg-12">
+                                    <label>Redacte su solicitud de manera clara y concisa</label>
+                                    <textarea class="alinear5 texto" maxlength="1000"  id="descripcion_solicitud" name = "descripcion"></textarea>
+                                    <br>
                                     <label>Selecciona el servicio que deseas solicitar</label>
                                     <select class="form-select fecha" id="diaNac" name = "servicioasignado">
-                                        <option value="0">Tipo de solicitud</option>
-                                        <option value="1">Agua potable y servicios hidráulicos</option>
-                                        <option value="2">Asistencia social</option>
-                                        <option value="3">Construcciones y obras</option>
-                                        <option value="4">Protección civil</option>
-                                        <option value="5">Seguridad pública y vialidad</option>
-                                        <option value="6">Servicios urbanos, limpia</option>
-                                        <option value="7">Chatarrización</option>
+                                        <option value="">Tipo de solicitud</option>
+                                        <option value="Agua potable y servicios hidráulicos">Agua potable y servicios hidráulicos</option>
+                                        <option value="Asistencia social">Asistencia social</option>
+                                        <option value="Construcciones y obras">Construcciones y obras</option>
+                                        <option value="Protección civil">Protección civil</option>
+                                        <option value="Seguridad pública y vialidad">Seguridad pública y vialidad</option>
+                                        <option value="Servicios urbanos, limpia">Servicios urbanos, limpia</option>
+                                        <option value="Chatarrización">Chatarrización</option>
                                     </select>
-                                    <small class="text-danger form-text"></small>
+                                    <br>
+                                    <label>Introduzca la fecha actual</label>
+                                    <input type="text" name="fecha" placeholder="DD/MM/AA">
+                                    <br>
+                                    <c:forEach items="${ listUniqueUser }" var="user" varStatus="status">
+                                        <input type="hidden" name="idEmpleado" value="${ user.idEmpleados }">
+                                    </c:forEach>
+                                    <input type="hidden" name="idEnlace" value="1">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-body">
-                        <div class="col-lg-20">
-                            <div class="form-group"></div>
-                            <div>
-                                <p text-muted text-gray-900 class="texto" >Redacte su solicitud de manera clara y concisa</p>
-                                <textarea class="alinear5 texto" maxlength="1000"  id="descripcion_solicitud" name = "descripcion"></textarea>
-                            </div>
-                            <small class="text-danger form-text"></small>
-                        </div>
-                    </div>
-                    <div class="form-control">
-                        <div class="col-lg-12">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <br>
-                                    <label>Estado</label>
-                                    <input type="number" class="form-control campo" id="estadoSolicitud"
-                                           pattern="^[a-zA-ZáéíóúÁÉÍÓÚÑñüÜ0-9 ]+" title="Sólo letras" name = "status" />
-                                    <small class="text-danger form-text"></small>
-                                </div>
-                                <div class="col-lg-6">
-                                    <br>
-                                    <label>Fecha Inicio</label>
-                                    <input type="date" class="form-control campo" id="coloniaEnlace" name = "fechainicio"
-                                           pattern="^[a-zA-ZáéíóúÁÉÍÓÚÑñüÜ0-9 ]+" title="Sólo letras" />
-                                    <small class="text-danger form-text"></small>
-                                </div>
-                            </div>
-                        </div>
+
                         <br>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                            <button type="submit" class="btn btn-success" id="GuardarEnlace">Guardar</button>
+                            <button type="submit" class="btn btn-success" id="GuardarEnlace" name="action" value="createSoli">Guardar</button>
                         </div>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
